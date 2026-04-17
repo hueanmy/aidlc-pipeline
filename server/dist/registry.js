@@ -2,7 +2,7 @@ import { readdirSync, existsSync } from "fs";
 import { join, basename } from "path";
 import { log } from "./config.js";
 /**
- * Scan the content/ directory and build an index of all available content.
+ * Scan the content root and build an index of all available content.
  * For each item, records which layer files exist (generic, platform, project).
  */
 export function buildIndex(config) {
@@ -65,12 +65,12 @@ function scanSkillDirs(config, map) {
 }
 /**
  * Return the ordered list of layer directories for a given content kind.
- * Order: generic -> platform -> project
+ * Order: generic (root) -> platform -> project
  */
 function getLayerDirs(config, kind) {
     const dirs = [];
-    // Layer 1: generic
-    dirs.push(join(config.contentRoot, "generic", kind));
+    // Layer 1: generic (flat at content root)
+    dirs.push(join(config.contentRoot, kind));
     // Layer 2: platform
     if (config.platform) {
         dirs.push(join(config.contentRoot, "platforms", config.platform, kind));

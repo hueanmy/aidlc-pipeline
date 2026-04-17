@@ -12,7 +12,7 @@ export interface ServerConfig {
 /**
  * Read env vars and resolve the content root directory.
  * At runtime, __dirname is server/dist/, so we go up two levels to
- * cf-sdlc-pipeline/, then into content/.
+ * the package root where skills/, agents/, templates/, platforms/ live.
  */
 export declare function loadConfig(): ServerConfig;
 /** Log to stderr so we don't interfere with MCP's stdout protocol. */

@@ -12,7 +12,7 @@ export interface ContentIndex {
     templates: Map<string, ContentEntry>;
 }
 /**
- * Scan the content/ directory and build an index of all available content.
+ * Scan the content root and build an index of all available content.
  * For each item, records which layer files exist (generic, platform, project).
  */
 export declare function buildIndex(config: ServerConfig): ContentIndex;

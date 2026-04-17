@@ -2,3 +2,8 @@ node_modules/
 out/
 *.vsix
 .DS_Store
+
+# MCP auto-sync artifacts (generated on boot)
+.claude/agents/
+.claude/skills/
+docs/sdlc/

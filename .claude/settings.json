@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(timeout 2 node server/dist/index.js)",
+      "Bash(node -e ' *)",
+      "Bash(npm view *)",
+      "Bash(npm whoami *)",
+      "Bash(npm pack *)",
+      "Bash(curl -sI https://www.npmjs.com/~meii)",
+      "Bash(curl -s \"https://registry.npmjs.org/-/user/org.couchdb.user:meii\")",
+      "Bash(find src *)"
+    ]
+  },
   "mcpServers": {
     "sdlc": {
       "command": "npx",

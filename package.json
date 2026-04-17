@@ -8,8 +8,10 @@
   },
   "files": [
     "server/dist/",
-    "content/generic/",
-    "content/platforms/"
+    "skills/",
+    "agents/",
+    "templates/",
+    "platforms/"
   ],
   "scripts": {
     "build": "cd server && npm run build",
@@ -25,7 +27,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hueanmy/aidlc"
+    "url": "https://github.com/hueanmy/aidlc-pipeline"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

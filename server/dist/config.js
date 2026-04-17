@@ -5,15 +5,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 /**
  * Read env vars and resolve the content root directory.
  * At runtime, __dirname is server/dist/, so we go up two levels to
- * cf-sdlc-pipeline/, then into content/.
+ * the package root where skills/, agents/, templates/, platforms/ live.
  */
 export function loadConfig() {
     const platform = process.env.SDLC_PLATFORM || undefined;
     const project = process.env.SDLC_PROJECT || undefined;
-    const contentRoot = process.env.SDLC_CONTENT_ROOT || join(__dirname, "..", "..", "content");
+    const contentRoot = process.env.SDLC_CONTENT_ROOT || join(__dirname, "..", "..");
     let projectConfig;
     if (project) {
         const configPath = join(contentRoot, "projects", project, "config.json");
+        // Note: project-layer content lives at <contentRoot>/projects/<project>/
+        // (optional, not required for the flat generic + platforms layout)
         try {
             const raw = readFileSync(configPath, "utf-8");
             projectConfig = JSON.parse(raw);

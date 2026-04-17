@@ -23,7 +23,7 @@ const DEFAULT_PLATFORM_EXAMPLE = {
 };
 const PLATFORM_EXAMPLES = {
     mobile: {
-        prefix: "DRM",
+        prefix: "EPIC",
         title: "Camera capture reliability improvements",
         workflow: "Plan -> Design -> Test Plan -> Implement -> Review -> UAT -> Release",
         itsHint: "Cover device matrix, app lifecycle, camera permissions, and offline upload behavior.",
@@ -161,7 +161,7 @@ export function createMcpServer(overrides) {
         return mergeContent(entry.layers, config.projectConfig);
     }
     const server = new McpServer({
-        name: "cf-sdlc-pipeline",
+        name: "aidlc-pipeline",
         version: "1.0.0",
     });
     server.tool("list_agents", "List all available SDLC agent names", {}, () => ({
@@ -209,7 +209,7 @@ export function createMcpServer(overrides) {
         }
         // Install _gate-check.md (flat file, not in skill index)
         const gateCheckLayers = [];
-        const layerBases = [join(config.contentRoot, "generic", "skills")];
+        const layerBases = [join(config.contentRoot, "skills")];
         if (config.platform)
             layerBases.push(join(config.contentRoot, "platforms", config.platform, "skills"));
         if (config.project)
