@@ -1,7 +1,7 @@
 ---
 name: deploy
 description: Build and deploy to an environment. Stack-neutral — supports web (CDN / edge), mobile (store tracks / beta), desktop (update channels), backend (service environments), CLI (package registry). Runs pre-flight checks first.
-argument-hint: <environment> (dev | uat | prod)
+argument-hint: "<environment> (dev | uat | prod)"
 ---
 
 # Deploy

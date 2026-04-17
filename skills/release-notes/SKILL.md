@@ -1,7 +1,7 @@
 ---
 name: release-notes
 description: Generate release notes by analyzing code diff vs default branch + reading epic docs. Produces user-facing notes, internal changelog, and deploy changelog. Stack-neutral.
-argument-hint: [version] (e.g., 1.3.0, or blank to auto-detect from project)
+argument-hint: "[version] (e.g., 1.3.0, or blank to auto-detect from project)"
 ---
 
 # Generate Release Notes

@@ -1,7 +1,7 @@
 ---
 name: coding-rules
 description: Stack-neutral senior coding rules. Reference for all agents and skills when writing or reviewing code. Adapt specifics in CLAUDE.md for the project's chosen stack.
-argument-hint: [area] (e.g., architecture, concurrency, security, testing, all)
+argument-hint: "[area] (e.g., architecture, concurrency, security, testing, all)"
 ---
 
 # Coding Rules

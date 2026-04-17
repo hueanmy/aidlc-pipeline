@@ -1,7 +1,7 @@
 ---
 name: review
 description: Epic-driven code review. Validates PR / branch / file / working tree against epic docs (PRD, Tech Design, Test Plan). Stack-neutral — applies to web, mobile, desktop, backend, CLI.
-argument-hint: [PR-number | file-path | branch-name | blank for uncommitted]
+argument-hint: "[PR-number | file-path | branch-name | blank for uncommitted]"
 ---
 
 # Code Review

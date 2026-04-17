@@ -1,7 +1,7 @@
 ---
 name: doc-sync
 description: Run doc reverse-sync for an epic. Compares what was planned vs what was built, then updates affected docs. Stack-neutral — applies to any product surface.
-argument-hint: <{{EPIC_PREFIX}}-XXXX>
+argument-hint: "<{{EPIC_PREFIX}}-XXXX>"
 ---
 
 # Doc Reverse-Sync for Epic $0

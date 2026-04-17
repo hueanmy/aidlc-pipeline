@@ -1,7 +1,7 @@
 ---
 name: monitor
 description: Post-release monitoring check. Analyzes error/crash signals, analytics anomalies, and user feedback to generate a health report. Stack-neutral — works for web, mobile, desktop, backend, CLI.
-argument-hint: [version] (e.g., v1.2.0, or blank for latest)
+argument-hint: "[version] (e.g., v1.2.0, or blank for latest)"
 ---
 
 # Post-Release Monitor

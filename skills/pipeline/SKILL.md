@@ -1,7 +1,7 @@
 ---
 name: pipeline
 description: Run the full SDLC pipeline for an epic. Orchestrates all team agents (PO, Tech Lead, QA, Dev, RM, SRE, Archivist) through each phase. Use to kick off or resume an epic's lifecycle.
-argument-hint: <{{EPIC_PREFIX}}-XXXX> [phase] (phases: plan, design, test-plan, implement, review, uat, release, monitor, doc-sync, or "full" for all)
+argument-hint: "<{{EPIC_PREFIX}}-XXXX> [phase] (phases: plan, design, test-plan, implement, review, uat, release, monitor, doc-sync, or \"full\" for all)"
 ---
 
 # SDLC Pipeline Orchestrator

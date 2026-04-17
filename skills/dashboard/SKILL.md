@@ -1,7 +1,7 @@
 ---
 name: dashboard
 description: Show SDLC pipeline dashboard for all epics. Displays pipeline status, current phase, responsible agent, and next action. Stack-neutral.
-argument-hint: [{{EPIC_PREFIX}}-XXXX] (optional — show specific epic, or blank for all)
+argument-hint: "[{{EPIC_PREFIX}}-XXXX] (optional — show specific epic, or blank for all)"
 ---
 
 # Pipeline Dashboard

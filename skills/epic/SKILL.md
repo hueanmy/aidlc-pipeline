@@ -1,7 +1,7 @@
 ---
 name: epic
 description: Scaffold a new epic with all SDLC artifacts, or review/update an existing epic. Use when starting new work — regardless of whether the product is web, mobile, desktop, backend, or CLI.
-argument-hint: <{{EPIC_PREFIX}}-XXXX> [title]
+argument-hint: "<{{EPIC_PREFIX}}-XXXX> [title]"
 ---
 
 # Epic: $ARGUMENTS

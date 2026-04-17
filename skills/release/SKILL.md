@@ -1,7 +1,7 @@
 ---
 name: release
 description: Prepare a release. Creates checklist, identifies included epics, verifies gates, and guides through the release process. Stack-neutral.
-argument-hint: <version> (e.g., 1.3.0)
+argument-hint: "<version> (e.g., 1.3.0)"
 ---
 
 # Release v$0

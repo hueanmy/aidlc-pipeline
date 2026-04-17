@@ -1,7 +1,7 @@
 ---
 name: benchmark
 description: Run performance benchmarks. Combines static analysis with guided profiling. Stack-neutral — adapts to web, mobile, desktop, backend, CLI. Enforces deterministic run protocol and reports median + p95.
-argument-hint: [area] (e.g., startup | api | render | data | all — define areas per project)
+argument-hint: "[area] (e.g., startup | api | render | data | all — define areas per project)"
 ---
 
 # Performance Benchmark

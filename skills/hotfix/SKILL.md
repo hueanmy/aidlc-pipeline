@@ -1,7 +1,7 @@
 ---
 name: hotfix
 description: Diagnose a production issue and guide through the hotfix process. Stack-neutral — works for web, mobile, desktop, backend, CLI. Accepts input from issue trackers, error dashboards, user feedback, or free-form description.
-argument-hint: <{{EPIC_PREFIX}}-XXXX> [issue source]
+argument-hint: "<{{EPIC_PREFIX}}-XXXX> [issue source]"
 ---
 
 # Hotfix for $ARGUMENTS

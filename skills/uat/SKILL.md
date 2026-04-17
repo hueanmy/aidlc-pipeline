@@ -1,7 +1,7 @@
 ---
 name: uat
 description: Generate a UAT (User Acceptance Testing) script for non-technical testers. Stack-neutral — adapts to web, mobile, desktop, and backend/API products.
-argument-hint: <{{EPIC_PREFIX}}-XXXX>
+argument-hint: "<{{EPIC_PREFIX}}-XXXX>"
 ---
 
 # UAT Script for Epic $0

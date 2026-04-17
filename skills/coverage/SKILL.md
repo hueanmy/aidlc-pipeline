@@ -1,7 +1,7 @@
 ---
 name: coverage
 description: Run tests with code coverage and generate a report. Stack-neutral — adapt commands to the project's test runner and coverage tooling.
-argument-hint: [filter] (e.g., area or layer to focus on — see CLAUDE.md, or "all")
+argument-hint: "[filter] (e.g., area or layer to focus on — see CLAUDE.md, or all)"
 ---
 
 # Code Coverage Report

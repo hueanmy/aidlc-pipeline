@@ -1,7 +1,7 @@
 ---
 name: prd
 description: Generate or review a PRD (Product Requirements Document) for an epic. Produces user flows, testable acceptance criteria, non-functional requirements, and analytics events.
-argument-hint: <{{EPIC_PREFIX}}-XXXX> [feature description]
+argument-hint: "<{{EPIC_PREFIX}}-XXXX> [feature description]"
 ---
 
 # PRD for Epic $0
