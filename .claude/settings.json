@@ -14,7 +14,10 @@
       "Bash(git stash *)",
       "Bash(node -e \"const p=require\\('./package.json'\\); p.version='0.5.7'; require\\('fs'\\).writeFileSync\\('package.json', JSON.stringify\\(p, null, 2\\)+'\\\\n'\\)\")",
       "Bash(vsce package *)",
-      "Bash(npx -y @vscode/vsce package)"
+      "Bash(npx -y @vscode/vsce package)",
+      "Bash(npx -y @vscode/vsce ls-publishers)",
+      "Bash(npx -y ovsx publish aidlc-0.5.7.vsix)",
+      "Bash(curl -s https://open-vsx.org/api/hueanmy)"
     ],
     "additionalDirectories": [
       "/Users/meii/Documents/aidlc-extension/src",

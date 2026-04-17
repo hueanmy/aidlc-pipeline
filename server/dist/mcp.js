@@ -199,36 +199,43 @@ export function createMcpServer(overrides) {
         results.push(...scaffolded);
         mkdirSync(skillsDir, { recursive: true });
         mkdirSync(agentsDir, { recursive: true });
-        // Install skills
+        // Install skills (only if missing — user edits are preserved)
         for (const [name, entry] of index.skills) {
-            const content = resolveContent(entry);
             const dir = join(skillsDir, name);
-            mkdirSync(dir, { recursive: true });
-            writeFileSync(join(dir, "SKILL.md"), content, "utf-8");
-            results.push(`skill/${name}`);
+            const skillFile = join(dir, "SKILL.md");
+            if (!existsSync(skillFile)) {
+                mkdirSync(dir, { recursive: true });
+                writeFileSync(skillFile, resolveContent(entry), "utf-8");
+                results.push(`skill/${name}`);
+            }
         }
         // Install _gate-check.md (flat file, not in skill index)
-        const gateCheckLayers = [];
-        const layerBases = [join(config.contentRoot, "skills")];
-        if (config.platform)
-            layerBases.push(join(config.contentRoot, "platforms", config.platform, "skills"));
-        if (config.project)
-            layerBases.push(join(config.contentRoot, "projects", config.project, "skills"));
-        for (const base of layerBases) {
-            const p = join(base, "_gate-check.md");
-            if (existsSync(p))
-                gateCheckLayers.push(p);
+        const gateCheckPath = join(skillsDir, "_gate-check.md");
+        if (!existsSync(gateCheckPath)) {
+            const gateCheckLayers = [];
+            const layerBases = [join(config.contentRoot, "skills")];
+            if (config.platform)
+                layerBases.push(join(config.contentRoot, "platforms", config.platform, "skills"));
+            if (config.project)
+                layerBases.push(join(config.contentRoot, "projects", config.project, "skills"));
+            for (const base of layerBases) {
+                const p = join(base, "_gate-check.md");
+                if (existsSync(p))
+                    gateCheckLayers.push(p);
+            }
+            if (gateCheckLayers.length > 0) {
+                const content = mergeContent(gateCheckLayers, config.projectConfig);
+                writeFileSync(gateCheckPath, content, "utf-8");
+                results.push("_gate-check.md");
+            }
         }
-        if (gateCheckLayers.length > 0) {
-            const content = mergeContent(gateCheckLayers, config.projectConfig);
-            writeFileSync(join(skillsDir, "_gate-check.md"), content, "utf-8");
-            results.push("_gate-check.md");
-        }
-        // Install agents
+        // Install agents (only if missing — user edits are preserved)
         for (const [name, entry] of index.agents) {
-            const content = resolveContent(entry);
-            writeFileSync(join(agentsDir, `${name}.md`), content, "utf-8");
-            results.push(`agent/${name}`);
+            const agentFile = join(agentsDir, `${name}.md`);
+            if (!existsSync(agentFile)) {
+                writeFileSync(agentFile, resolveContent(entry), "utf-8");
+                results.push(`agent/${name}`);
+            }
         }
         // Symlink project docs (core-business, its, workflow) into docs/
         // Single source of truth — edit in project = edit in content source
