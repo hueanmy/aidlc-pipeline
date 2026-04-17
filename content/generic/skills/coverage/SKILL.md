@@ -1,45 +1,50 @@
 ---
 name: coverage
-description: Run unit tests with code coverage and report percentage. Shows per-file breakdown and tracks progress toward 95% target.
-argument-hint: [filter] (e.g., Models, Services, Network, ViewModels, all)
+description: Run tests with code coverage and generate a report. Stack-neutral — adapt commands to the project's test runner and coverage tooling.
+argument-hint: [filter] (e.g., area or layer to focus on — see CLAUDE.md, or "all")
 ---
 
-# Unit Test Coverage Report
+# Code Coverage Report
 
-You are the **QA Engineer (QA)** agent on the {{PROJECT_NAME}} team.
+You are the **QA Engineer (QA)** agent — a senior test practitioner.
 Load your full persona from `.claude/agents/qa.md` before starting.
 
 ## Step 1: Run Tests with Coverage
 
-Run the project's test suite with coverage enabled. Adapt the command to your {{TECH_STACK}}:
+Use the project's test + coverage command, defined in `CLAUDE.md`:
 
 ```bash
-# Example — adapt to your project's build system and test runner
 {{TEST_COVERAGE_COMMAND}}
 ```
 
-If the test environment is not available, check available targets/runners:
+Common conventions:
+- **JS/TS** — `vitest run --coverage`, `jest --coverage`, `c8 node ...`
+- **Python** — `pytest --cov`, `coverage run -m pytest && coverage report`
+- **Go** — `go test ./... -coverprofile=coverage.out`
+- **Rust** — `cargo llvm-cov --html`
+- **JVM** — JaCoCo via Gradle/Maven
+- **Swift** — `xcodebuild test -enableCodeCoverage YES` + `xccov view`
+- **Android** — JaCoCo + Gradle `jacocoTestReport`
+- **.NET** — `dotnet test --collect:"XPlat Code Coverage"`
+
+If the test environment isn't available, show what's available:
 ```bash
 {{LIST_TEST_TARGETS_COMMAND}}
 ```
 
 ## Step 2: Extract Coverage Data
 
-### Overall summary:
+### Overall summary
 ```bash
 {{COVERAGE_SUMMARY_COMMAND}}
 ```
 
-### Per-file breakdown (filter by $ARGUMENTS if provided):
+### Per-file / per-module breakdown (filter by `$ARGUMENTS` if provided)
 ```bash
-# All files
 {{COVERAGE_DETAIL_COMMAND}}
-
-# Filter by layer (if $ARGUMENTS provided)
-{{COVERAGE_FILTER_COMMAND}}
 ```
 
-### Uncovered files (0% coverage):
+### Uncovered files (0% or below threshold)
 ```bash
 {{COVERAGE_UNCOVERED_COMMAND}}
 ```
@@ -50,64 +55,73 @@ If the test environment is not available, check available targets/runners:
 ## Coverage Report — {date}
 
 ### Summary
-| Target | Coverage | Lines Covered | Total Lines |
-|--------|----------|---------------|-------------|
-| {{PROJECT_NAME}} | X.XX% | XXXX | XXXXX |
+| Target | Coverage | Lines Covered | Total Lines | Branches |
+|--------|----------|---------------|-------------|----------|
+| {{PROJECT_NAME}} | X.XX% | XXXX | XXXXX | XX.XX% |
 
-### Target: 95%
-Progress: ██████░░░░░░░░░░░░░░ X.X% (need +XX.X%)
+### Target
+Project target: see `CLAUDE.md` (common floors: 70% for apps, 80–90% for libraries, 95% for safety-critical code)
+Progress: ██████░░░░░░░░░░░░░░ X.X% (need +XX.X% to target)
 
-### Coverage by Layer
-| Layer | Files Covered | Files Total | Avg Coverage |
-|-------|--------------|-------------|-------------|
-| Core/Models | X/XX | XX | X.X% |
-| Core/Services | X/XX | XX | X.X% |
-| Core/Network | X/XX | XX | X.X% |
-| Core/State | X/XX | XX | X.X% |
-| Views/ViewModels | X/XX | XX | X.X% |
-| Utilities | X/XX | XX | X.X% |
+### Coverage by Layer / Module
+| Layer / Module | Files covered | Files total | Avg coverage |
+|----------------|--------------|-------------|--------------|
+| <domain> | X/XX | XX | X.X% |
+| <services / business logic> | X/XX | XX | X.X% |
+| <adapters / infra> | X/XX | XX | X.X% |
+| <UI / presentation> | X/XX | XX | X.X% |
+| <utilities> | X/XX | XX | X.X% |
+
+Adapt the layer breakdown to the project's actual structure.
 
 ### Top Covered Files
 | File | Coverage |
 |------|----------|
-| file | XX.X% |
-| ... | ... |
+| ... | XX.X% |
 
-### Biggest Gaps (0% coverage, sorted by line count)
-| File | Lines | Priority |
-|------|-------|----------|
-| file | XXX | HIGH |
-| ... | ... | ... |
+### Biggest Gaps (lowest coverage, highest line count first)
+| File | Lines | Coverage | Priority |
+|------|-------|----------|----------|
+| ... | XXX | X% | HIGH / MED / LOW |
 
-### Test Count
-| Suite | Tests | Passed | Failed |
-|-------|-------|--------|--------|
-| Total | XX | XX | XX |
+Priority heuristic:
+- **HIGH** — low coverage on critical-path code (auth, payments, data mutation, core flows)
+- **MED** — low coverage on domain logic
+- **LOW** — low coverage on glue / scaffolding / generated code
+
+### Test Counts
+| Suite | Tests | Passed | Failed | Skipped |
+|-------|-------|--------|--------|---------|
+| Total | XX | XX | XX | XX |
 ```
 
 ## Step 4: Save Report
+
+Create the output directory once and write the report:
 
 ```bash
 mkdir -p {{BUILD_OUTPUT_DIR}}/coverage-reports
 ```
 
-Write to: `{{BUILD_OUTPUT_DIR}}/coverage-reports/coverage_{YYYY-MM-DD}.md`
+Write to `{{BUILD_OUTPUT_DIR}}/coverage-reports/coverage_{YYYY-MM-DD}.md`.
 
-## Step 5: Compare with Previous (if exists)
+## Step 5: Compare with Previous (if a prior report exists)
 
-If a previous report exists, compare:
 ```markdown
 ### Delta vs Previous
 | Metric | Previous | Current | Delta |
 |--------|----------|---------|-------|
-| Overall | X.X% | X.X% | +X.X% |
-| Lines covered | XXXX | XXXX | +XXX |
-| Test count | XX | XX | +XX |
+| Overall | X.X% | X.X% | +/- X.X% |
+| Lines covered | XXXX | XXXX | +/- XXX |
+| Branch coverage | X.X% | X.X% | +/- X.X% |
+| Test count | XX | XX | +/- XX |
 ```
 
-## Rules:
+## Rules
+
 - Always run in the fastest available test environment
-- Report must include per-layer breakdown
-- Flag any regression (coverage dropped)
+- Report must include per-layer / per-module breakdown
+- Flag any regression (coverage dropped) — regressions are blockers in many projects
 - Save report to `{{BUILD_OUTPUT_DIR}}/coverage-reports/`
-- Reference epic {{EPIC_PREFIX}}-XXXX for target tracking
+- Prefer **branch coverage** over line coverage where the runner supports it; branch coverage is a stronger signal
+- Coverage is a **floor**, not a ceiling — high coverage with weak assertions is worse than moderate coverage with sharp assertions
