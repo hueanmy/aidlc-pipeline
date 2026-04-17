@@ -1,0 +1,33 @@
+{
+  "name": "aidlc-pipeline",
+  "version": "1.0.0",
+  "description": "MCP server for AI-powered SDLC pipeline — agents, skills, and templates for Claude Code",
+  "type": "module",
+  "bin": {
+    "aidlc-pipeline": "server/dist/index.js"
+  },
+  "files": [
+    "server/dist/",
+    "content/generic/",
+    "content/platforms/"
+  ],
+  "scripts": {
+    "build": "cd server && npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "express": "^4.21.2",
+    "gray-matter": "^4.0.3",
+    "zod": "^3.24.4"
+  },
+  "keywords": ["mcp", "sdlc", "claude-code", "pipeline", "aidlc", "agents"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hueanmy/aidlc"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}
