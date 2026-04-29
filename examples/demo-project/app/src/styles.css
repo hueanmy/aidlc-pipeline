@@ -1,0 +1,161 @@
+* { box-sizing: border-box; }
+
+:root {
+  color-scheme: light dark;
+  --bg: #fafafa;
+  --panel: #ffffff;
+  --border: #e5e5ea;
+  --text: #111;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --danger: #dc2626;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0d12;
+    --panel: #161922;
+    --border: #2a2f3a;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.error { color: var(--danger); font-size: 13px; }
+
+button {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button[type="submit"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+button[type="submit"]:hover { background: var(--accent-hover); }
+
+input, select {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Sign in */
+.signin {
+  max-width: 380px;
+  margin: 80px auto;
+  padding: 32px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.signin h1 { margin: 0 0 4px; }
+.signin form { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.signin label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.signin label input { font-size: 14px; color: var(--text); }
+.signin button[type="submit"] { margin-top: 4px; }
+
+/* App shell */
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.topbar {
+  display: flex; gap: 16px; align-items: center;
+  padding: 12px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.topbar strong { font-size: 16px; }
+.topbar > .muted { flex: 1; }
+
+main { padding: 24px; }
+
+/* Board */
+.board-header {
+  display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.board-header h2 { margin: 0; flex: 0 0 auto; }
+.composer { display: flex; gap: 8px; flex: 1; min-width: 280px; }
+.composer input { flex: 1; }
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.column {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.column h3 { margin: 0 0 12px; font-size: 14px; }
+.column ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.empty { font-style: italic; }
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--bg);
+}
+.card-title { font-size: 14px; margin-bottom: 8px; }
+.card-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.card-actions button { padding: 3px 8px; font-size: 11px; }
+.card-actions .archive { color: var(--danger); border-color: var(--danger); }
+
+/* Toaster */
+.toaster {
+  position: fixed; top: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 1000;
+  max-width: 320px;
+}
+.toast {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  animation: toast-in 0.18s ease-out;
+}
+.toast-body { flex: 1; }
+.toast button {
+  border: none; background: transparent; color: var(--muted);
+  font-size: 18px; line-height: 1; padding: 2px 6px;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}

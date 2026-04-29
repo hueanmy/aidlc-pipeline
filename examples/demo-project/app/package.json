@@ -1,0 +1,23 @@
+{
+  "name": "taskflow-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Sample TaskFlow client implementing the auth/tasks/notifications specs in ../docs/core-business. Uses localStorage as a mock backend so it runs offline.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.1"
+  }
+}
