@@ -5,7 +5,7 @@ This file is referenced by all pipeline-phase skills. When a skill says
 
 ## When Gate Check Applies
 
-**Gate check ONLY applies when a skill is run for a specific epic** (e.g., `/tech-design {{EPIC_PREFIX}}-2100`, `/uat {{EPIC_PREFIX}}-2100`).
+**Gate check ONLY applies when a skill is run for a specific epic** (e.g., `/tech-design {{EPIC_PREFIX}}-2100`, `/execute-test {{EPIC_PREFIX}}-2100`).
 
 If the skill is run **without an epic context** — no epic key in arguments, no epic-related branch — **skip the gate check entirely** and proceed normally. The gate is about enforcing epic pipeline order, not about blocking standalone tool usage.
 
@@ -37,14 +37,14 @@ Each skill maps to a pipeline phase:
 | `/tech-design` | `design` | 2 |
 | `/test-plan` | `test-plan` | 3 |
 | `/review` | `review` | 5 |
-| `/uat` | `uat` | 6 |
+| `/execute-test` | `execute-test` | 6 |
 | `/release` | `release` | 7 |
 | `/release-notes` | `release` | 7 |
 | `/deploy` | `release` | 7 |
 | `/monitor` | `monitor` | 8 |
 | `/doc-sync` | `doc-sync` | 9 |
 
-Phase order: `plan`(1) → `design`(2) → `test-plan`(3) → `implement`(4) → `review`(5) → `uat`(6) → `release`(7) → `monitor`(8) → `doc-sync`(9)
+Phase order: `plan`(1) → `design`(2) → `test-plan`(3) → `implement`(4) → `review`(5) → `execute-test`(6) → `release`(7) → `monitor`(8) → `doc-sync`(9)
 
 ### 4. Check if This Phase is Enabled
 
@@ -69,7 +69,7 @@ Walk through the phase order. For each phase **before** this skill's phase that 
 | `test-plan` | `docs/sdlc/epics/{{EPIC_PREFIX}}-XXXX/TEST-PLAN.md` exists with real content |
 | `implement` | Feature branch `*{{EPIC_PREFIX}}-XXXX*` exists (`git branch --all --list "*{{EPIC_PREFIX}}-XXXX*"`) |
 | `review` | `docs/sdlc/epics/{{EPIC_PREFIX}}-XXXX/APPROVAL.md` contains `[x]` (approved) |
-| `uat` | `docs/sdlc/epics/{{EPIC_PREFIX}}-XXXX/UAT-SCRIPT.md` exists with real content |
+| `execute-test` | `docs/sdlc/epics/{{EPIC_PREFIX}}-XXXX/TEST-SCRIPT.md` exists with real content |
 | `release` | Git tag exists for this epic's commits |
 | `monitor` | Health report generated |
 | `doc-sync` | `docs/sdlc/epics/{{EPIC_PREFIX}}-XXXX/DOC-REVERSE-SYNC.md` exists with real content |

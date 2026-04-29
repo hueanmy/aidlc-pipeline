@@ -1,0 +1,138 @@
+{
+  "phaseOrder": [
+    "plan",
+    "design",
+    "test-plan",
+    "implement",
+    "review",
+    "execute-test",
+    "release",
+    "monitor",
+    "doc-sync"
+  ],
+  "humanGates": ["plan", "design", "test-plan", "implement"],
+  "rejectTo": {
+    "design": ["plan"],
+    "test-plan": ["plan", "design"],
+    "implement": ["plan", "design", "test-plan"],
+    "review": ["plan", "design", "test-plan", "implement"],
+    "execute-test": ["plan", "design", "test-plan", "implement", "review"],
+    "release": ["plan", "design", "test-plan", "implement", "review", "execute-test"],
+    "monitor": ["plan", "design", "test-plan", "implement", "review", "execute-test", "release"],
+    "doc-sync": ["plan", "design", "test-plan", "implement", "review", "execute-test", "release", "monitor"]
+  },
+  "phaseWorker": {
+    "plan": "po",
+    "design": "tech-lead",
+    "test-plan": "qa",
+    "implement": "developer",
+    "review": "tech-lead",
+    "execute-test": "qa",
+    "release": "release-manager",
+    "monitor": "sre",
+    "doc-sync": "archivist"
+  },
+  "artifacts": {
+    "plan": ["{{EPIC_KEY}}.md", "PRD.md"],
+    "design": ["TECH-DESIGN.md"],
+    "test-plan": ["TEST-PLAN.md"],
+    "implement": [],
+    "review": ["APPROVAL.md"],
+    "execute-test": ["TEST-SCRIPT.md"],
+    "release": [],
+    "monitor": [],
+    "doc-sync": ["DOC-REVERSE-SYNC.md"]
+  },
+  "checklists": {
+    "plan": {
+      "structure": [
+        "{{EPIC_KEY}}.md exists with length > 500 chars",
+        "PRD.md exists with length > 500 chars",
+        "PRD.md has sections: Problem Statement, Scope, User Stories, Acceptance Criteria",
+        "epic.json has non-empty affected_modules array",
+        "No {{ placeholder or [TODO] markers remain"
+      ],
+      "semantic": [
+        "Every user story has at least one acceptance criterion",
+        "Scope clearly states in-scope and out-of-scope items",
+        "Success metrics are measurable (numbers, thresholds, or observable outcomes)"
+      ]
+    },
+    "design": {
+      "structure": [
+        "TECH-DESIGN.md exists with length > 800 chars",
+        "TECH-DESIGN.md has sections: Architecture, Components, Data Flow, Risks",
+        "No {{ placeholder or [TODO] markers remain"
+      ],
+      "semantic": [
+        "Every user story from PRD is traced to a component or subsystem",
+        "Risks section identifies at least one mitigation per risk",
+        "Design does not contradict any documented tech-stack constraints (docs/its/)"
+      ]
+    },
+    "test-plan": {
+      "structure": [
+        "TEST-PLAN.md exists with length > 500 chars",
+        "TEST-PLAN.md has sections: Scope, Test Cases, Coverage Matrix",
+        "Every PRD acceptance criterion maps to at least one test case"
+      ],
+      "semantic": [
+        "Test cases cover happy path, edge cases, and error paths",
+        "Coverage matrix shows no gaps against acceptance criteria"
+      ]
+    },
+    "implement": {
+      "structure": [
+        "Feature branch exists matching pattern *{{EPIC_KEY}}*",
+        "Commits on branch reference the epic key"
+      ],
+      "semantic": [
+        "Changed files fall within affected_modules",
+        "No TODO/FIXME left in changed files without an issue link"
+      ]
+    },
+    "review": {
+      "structure": [
+        "APPROVAL.md exists and contains [x] or [approved]"
+      ],
+      "semantic": [
+        "Reviewer called out deviations from TECH-DESIGN if any",
+        "All critical comments are resolved"
+      ]
+    },
+    "execute-test": {
+      "structure": [
+        "TEST-SCRIPT.md exists with length > 300 chars",
+        "TEST-SCRIPT.md lists steps to reproduce each user story"
+      ],
+      "semantic": [
+        "Steps reference actual screens/components from implementation",
+        "Expected outcomes match PRD acceptance criteria"
+      ]
+    },
+    "release": {
+      "structure": [
+        "Git tag exists for the epic commits"
+      ],
+      "semantic": [
+        "Release notes reference the epic key and user-facing changes"
+      ]
+    },
+    "monitor": {
+      "structure": [
+        "Health/metric report exists for post-release window"
+      ],
+      "semantic": [
+        "Metrics reflect the acceptance criteria from PRD"
+      ]
+    },
+    "doc-sync": {
+      "structure": [
+        "DOC-REVERSE-SYNC.md exists with length > 200 chars"
+      ],
+      "semantic": [
+        "Relevant docs/core-business/*.md files reflect the shipped behavior"
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "epic_id": "EPIC-1000",
+  "project": "taskflow",
+  "title": "Bulk-assign cards from board view",
+  "brief": "Power users want to multi-select cards on the board and assign all of them to one teammate in a single action. Today they must open each card individually. Reduces friction for sprint kickoff and triage. Affects the Tasks board UI, the assignment endpoint, and the assignment notification.",
+  "affected_modules": ["auth", "tasks"],
+  "owner": "po"
+}

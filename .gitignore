@@ -6,4 +6,5 @@ out/
 # MCP auto-sync artifacts (generated on boot)
 .claude/agents/
 .claude/skills/
+.claude/schemas/
 docs/sdlc/

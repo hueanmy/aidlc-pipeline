@@ -1,10 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { writeFileSync, mkdirSync, existsSync, symlinkSync, lstatSync, rmSync } from "fs";
+import { writeFileSync, mkdirSync, existsSync, symlinkSync, lstatSync, rmSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { loadConfig, log } from "./config.js";
 import { buildIndex } from "./registry.js";
 import { mergeContent } from "./merger.js";
+import { loadReviewMatrix, writeEpic, startPhase, setPhaseStatus, buildPhaseContext, cascadeReject, amendAffectedModules, getEpicStatus, listWorkspaceModules, } from "./orchestrator.js";
 /** Safe lstat that returns false instead of throwing for non-existent paths */
 function lstatSafe(p) {
     try {
@@ -15,69 +16,25 @@ function lstatSafe(p) {
         return false;
     }
 }
-const DEFAULT_PLATFORM_EXAMPLE = {
-    prefix: "EPIC",
-    title: "Cross-platform onboarding optimization",
-    workflow: "Plan -> Design -> Build -> Test -> Review -> UAT -> Release -> Monitor -> Doc Sync",
-    itsHint: "Define integration points, constraints, and acceptance criteria for the target platform.",
-};
-const PLATFORM_EXAMPLES = {
-    mobile: {
-        prefix: "EPIC",
-        title: "Camera capture reliability improvements",
-        workflow: "Plan -> Design -> Test Plan -> Implement -> Review -> UAT -> Release",
-        itsHint: "Cover device matrix, app lifecycle, camera permissions, and offline upload behavior.",
-    },
-    web: {
-        prefix: "WEB",
-        title: "Checkout resilience and retry flow",
-        workflow: "Plan -> Design -> Build -> Test -> Review -> Release -> Monitor",
-        itsHint: "Include SSR/CSR behavior, browser support matrix, and API timeout handling.",
-    },
-    backend: {
-        prefix: "API",
-        title: "Order event ingestion hardening",
-        workflow: "Plan -> Design -> Build -> Test -> Review -> Release -> Monitor",
-        itsHint: "Document contracts, idempotency, retries, and observability metrics.",
-    },
-    desktop: {
-        prefix: "DSK",
-        title: "Offline draft synchronization",
-        workflow: "Plan -> Design -> Build -> Test -> Review -> UAT -> Release",
-        itsHint: "Detail filesystem constraints, migration behavior, and reconnect conflict rules.",
-    },
-    generic: {
-        prefix: "EPIC",
-        title: "Cross-platform onboarding optimization",
-        workflow: "Plan -> Design -> Build -> Test -> Review -> UAT -> Release -> Monitor -> Doc Sync",
-        itsHint: "Define integration points, constraints, and acceptance criteria for the target platform.",
-    },
-};
-function getPlatformExample(platform) {
-    if (!platform)
-        return DEFAULT_PLATFORM_EXAMPLE;
-    return PLATFORM_EXAMPLES[platform] ?? DEFAULT_PLATFORM_EXAMPLE;
-}
-function ensureDocsScaffold(workspace, config) {
+function ensureDocsScaffold(workspace) {
     const results = [];
     const docsRoot = join(workspace, "docs", "sdlc");
     const workflowDir = join(docsRoot, "workflow");
     const epicsDir = join(docsRoot, "epics");
     mkdirSync(workflowDir, { recursive: true });
     mkdirSync(epicsDir, { recursive: true });
-    const platformProfile = getPlatformExample(config.platform);
-    const exampleKey = `${platformProfile.prefix}-1000`;
+    const exampleKey = "EPIC-1000";
     const exampleDir = join(epicsDir, exampleKey);
     mkdirSync(exampleDir, { recursive: true });
     const workflowReadme = join(workflowDir, "README.md");
     if (!existsSync(workflowReadme)) {
         const workflowContent = [
-            `# SDLC Workflow (${config.platform ?? "generic"})`,
+            "# SDLC Workflow",
             "",
             "This folder documents your SDLC operating model for epics.",
             "",
             "## Default flow",
-            platformProfile.workflow,
+            "Plan -> Design -> Test Plan -> Implement -> Review -> UAT -> Release -> Monitor -> Doc Sync",
             "",
             "## How to use",
             "1. Keep one folder per epic under docs/sdlc/epics/.",
@@ -91,7 +48,7 @@ function ensureDocsScaffold(workspace, config) {
     const epicDoc = join(exampleDir, `${exampleKey}.md`);
     if (!existsSync(epicDoc)) {
         const epicContent = [
-            `# ${exampleKey} - ${platformProfile.title}`,
+            `# ${exampleKey} - Reference epic`,
             "",
             "## Goal",
             "Provide a reference epic so teams can validate the dashboard and phase workflow end-to-end.",
@@ -128,31 +85,9 @@ function ensureDocsScaffold(workspace, config) {
         writeFileSync(prdDoc, prdContent, "utf-8");
         results.push(`docs/sdlc/epics/${exampleKey}/PRD.md`);
     }
-    const itsDoc = join(exampleDir, "ITS.md");
-    if (!existsSync(itsDoc)) {
-        const itsContent = [
-            `# ITS - ${exampleKey}`,
-            "",
-            "## Integration Scope",
-            platformProfile.itsHint,
-            "",
-            "## Dependencies",
-            "- Existing product architecture and coding rules",
-            "- CI pipeline for build and test automation",
-            "- Monitoring and alerting baseline",
-            "",
-            "## Validation",
-            "Document integration tests and edge-case scenarios that must pass before release.",
-            "",
-        ].join("\n");
-        writeFileSync(itsDoc, itsContent, "utf-8");
-        results.push(`docs/sdlc/epics/${exampleKey}/ITS.md`);
-    }
     return results;
 }
 export function createMcpServer(overrides) {
-    if (overrides?.platform)
-        process.env.SDLC_PLATFORM = overrides.platform;
     if (overrides?.project)
         process.env.SDLC_PROJECT = overrides.project;
     const config = loadConfig();
@@ -195,7 +130,7 @@ export function createMcpServer(overrides) {
         const results = [];
         const skillsDir = join(workspace, ".claude", "skills");
         const agentsDir = join(workspace, ".claude", "agents");
-        const scaffolded = ensureDocsScaffold(workspace, config);
+        const scaffolded = ensureDocsScaffold(workspace);
         results.push(...scaffolded);
         mkdirSync(skillsDir, { recursive: true });
         mkdirSync(agentsDir, { recursive: true });
@@ -214,8 +149,6 @@ export function createMcpServer(overrides) {
         if (!existsSync(gateCheckPath)) {
             const gateCheckLayers = [];
             const layerBases = [join(config.contentRoot, "skills")];
-            if (config.platform)
-                layerBases.push(join(config.contentRoot, "platforms", config.platform, "skills"));
             if (config.project)
                 layerBases.push(join(config.contentRoot, "projects", config.project, "skills"));
             for (const base of layerBases) {
@@ -235,6 +168,20 @@ export function createMcpServer(overrides) {
             if (!existsSync(agentFile)) {
                 writeFileSync(agentFile, resolveContent(entry), "utf-8");
                 results.push(`agent/${name}`);
+            }
+        }
+        // Install schemas (epic.schema.md, status.schema.md) — referenced by
+        // orchestrator/auto-reviewer agents and by /advance-epic.
+        const schemasSrcDir = join(config.contentRoot, "schemas");
+        if (existsSync(schemasSrcDir)) {
+            const schemasDir = join(workspace, ".claude", "schemas");
+            mkdirSync(schemasDir, { recursive: true });
+            for (const file of readdirSync(schemasSrcDir).filter((f) => f.endsWith(".md"))) {
+                const dst = join(schemasDir, file);
+                if (!existsSync(dst)) {
+                    writeFileSync(dst, readFileSync(join(schemasSrcDir, file), "utf-8"), "utf-8");
+                    results.push(`schema/${file}`);
+                }
             }
         }
         // Symlink project docs (core-business, its, workflow) into docs/
@@ -285,6 +232,177 @@ export function createMcpServer(overrides) {
                     text: `Installed ${results.length} items into ${ws}:\n${results.map(r => `  ✓ ${r}`).join("\n")}`,
                 }],
         };
+    });
+    // -------------------------------------------------------------------------
+    // Orchestrator tools — drive the full-auto SDLC loop.
+    //
+    // All tools take `workspace` (absolute path to the user's project root, where
+    // docs/sdlc/epics/ lives) because a single MCP server may serve multiple
+    // projects. Epic state is on-disk under the workspace.
+    // -------------------------------------------------------------------------
+    const PhaseEnum = z.enum([
+        "plan",
+        "design",
+        "test-plan",
+        "implement",
+        "review",
+        "execute-test",
+        "release",
+        "monitor",
+        "doc-sync",
+    ]);
+    const StatusEnum = z.enum([
+        "pending",
+        "in_progress",
+        "in_review",
+        "awaiting_human_review",
+        "passed",
+        "rejected",
+        "stale",
+        "failed_needs_human",
+    ]);
+    const VerdictSchema = z
+        .object({
+        decision: z.enum(["pass", "reject"]),
+        reviewer: z.string(),
+        at: z.string().optional(),
+        reject_to: PhaseEnum.optional(),
+        reason: z.string(),
+        checklist_results: z.record(z.string(), z.enum(["pass", "fail"])).optional(),
+    })
+        .optional();
+    function jsonResult(obj) {
+        return { content: [{ type: "text", text: JSON.stringify(obj, null, 2) }] };
+    }
+    function errorResult(msg) {
+        return { content: [{ type: "text", text: msg }], isError: true };
+    }
+    server.tool("epic_status", "Get full status report for an epic: metadata, per-phase status, and the next step the orchestrator should take. Used by the Orchestrator at the top of every loop iteration.", {
+        workspace: z.string().describe("Absolute path to the user's project root"),
+        epic_id: z.string().describe("Epic key, e.g. EPIC-123"),
+    }, ({ workspace, epic_id }) => {
+        try {
+            const matrix = loadReviewMatrix(config);
+            return jsonResult(getEpicStatus(workspace, epic_id, matrix));
+        }
+        catch (err) {
+            return errorResult(`epic_status failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("phase_context", "Build the context payload the Orchestrator passes to a worker for a given phase. Returns epic metadata, selected core-business files (from <workspace>/docs/core-business/), its/workflow paths, upstream artifact paths, and the phase's checklist.", {
+        workspace: z.string().describe("Absolute path to the user's project root"),
+        epic_id: z.string().describe("Epic key"),
+        phase: PhaseEnum.describe("Phase id"),
+    }, ({ workspace, epic_id, phase }) => {
+        try {
+            const matrix = loadReviewMatrix(config);
+            return jsonResult(buildPhaseContext(config, workspace, epic_id, phase, matrix));
+        }
+        catch (err) {
+            return errorResult(`phase_context failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("start_phase", "Begin a new (re)run of a phase. Archives prior artifacts if stale/rejected, bumps revision, and sets status to in_progress. Call this BEFORE dispatching the worker.", {
+        workspace: z.string(),
+        epic_id: z.string(),
+        phase: PhaseEnum,
+    }, ({ workspace, epic_id, phase }) => {
+        try {
+            return jsonResult(startPhase(workspace, epic_id, phase));
+        }
+        catch (err) {
+            return errorResult(`start_phase failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("set_phase_status", "Transition a phase status WITHOUT archival. Use for: in_review (auto-reviewer started), passed, awaiting_human_review (at a human gate), failed_needs_human (retries exhausted). For rejected, use reject_gate; for beginning a new run, use start_phase.", {
+        workspace: z.string(),
+        epic_id: z.string(),
+        phase: PhaseEnum,
+        status: StatusEnum,
+        verdict: VerdictSchema,
+    }, ({ workspace, epic_id, phase, status, verdict }) => {
+        try {
+            const stampedVerdict = verdict
+                ? { ...verdict, at: verdict.at ?? new Date().toISOString() }
+                : undefined;
+            return jsonResult(setPhaseStatus(workspace, epic_id, phase, status, stampedVerdict));
+        }
+        catch (err) {
+            return errorResult(`set_phase_status failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("reject_gate", "Reject a phase back to an upstream phase (cascade). The target is archived + revision-bumped + marked rejected. Intermediate passed phases are marked stale. The reviewer (human from extension or auto-reviewer) is recorded in the verdict.", {
+        workspace: z.string(),
+        epic_id: z.string(),
+        from_phase: PhaseEnum.describe("Phase that produced the reject"),
+        reject_to: PhaseEnum.describe("Upstream phase to bounce back to"),
+        reason: z.string().describe("Why the reject happened — surfaced in the UI"),
+        reviewer: z.string().describe("e.g. 'auto-reviewer' or 'human:<email>'"),
+    }, ({ workspace, epic_id, from_phase, reject_to, reason, reviewer }) => {
+        try {
+            const matrix = loadReviewMatrix(config);
+            const verdict = {
+                decision: "reject",
+                reviewer,
+                at: new Date().toISOString(),
+                reject_to,
+                reason,
+            };
+            cascadeReject(workspace, epic_id, from_phase, reject_to, verdict, matrix);
+            return jsonResult({ ok: true, verdict });
+        }
+        catch (err) {
+            return errorResult(`reject_gate failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("amend_affected_modules", "Append-only: add modules to epic.json's affected_modules and log the entry in module_amend_log. Used by the Tech Lead at the Design phase when additional modules are discovered. Cannot remove modules — if a declared module turns out to be wrong, reject back to Plan so the PO re-scopes.", {
+        workspace: z.string(),
+        epic_id: z.string(),
+        by: z.string().describe("Agent id, e.g. 'tech-lead'"),
+        added: z.array(z.string()).min(1).describe("Modules to append (append-only, no removal)"),
+        reason: z.string(),
+    }, ({ workspace, epic_id, by, added, reason }) => {
+        try {
+            return jsonResult(amendAffectedModules(workspace, epic_id, by, added, reason));
+        }
+        catch (err) {
+            return errorResult(`amend_affected_modules failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("list_project_modules", "List the available core-business module filenames in the user's workspace (<workspace>/docs/core-business/*.md). Used as a fallback when the PO needs to pick affected_modules for a new epic. Returns an empty list (not an error) if the folder doesn't exist.", {
+        workspace: z.string().describe("Absolute path to the user's project root"),
+    }, ({ workspace }) => {
+        try {
+            return jsonResult(listWorkspaceModules(workspace));
+        }
+        catch (err) {
+            return errorResult(`list_project_modules failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    });
+    server.tool("init_epic", "Create or overwrite docs/sdlc/epics/<epic_id>/epic.json with the given metadata. Used by /epic or by the user when bootstrapping a new epic for /advance-epic.", {
+        workspace: z.string(),
+        epic_id: z.string(),
+        project: z.string(),
+        brief: z.string(),
+        affected_modules: z.array(z.string()).default([]),
+        title: z.string().optional(),
+        owner: z.string().optional(),
+    }, ({ workspace, epic_id, project, brief, affected_modules, title, owner }) => {
+        try {
+            const epic = {
+                epic_id,
+                project,
+                brief,
+                affected_modules,
+                ...(title ? { title } : {}),
+                ...(owner ? { owner } : {}),
+            };
+            writeEpic(workspace, epic);
+            return jsonResult({ ok: true, epic });
+        }
+        catch (err) {
+            return errorResult(`init_epic failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
     });
     return { server, config };
 }

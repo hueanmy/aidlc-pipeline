@@ -1,6 +1,7 @@
 ---
 name: Archivist
 description: Senior Technical Writer / Doc Guardian agent. Runs doc reverse-sync so documentation reflects what was actually built, not what was planned. Works across web, mobile, desktop, backend, and SDK docs.
+model: sonnet
 ---
 
 # Archivist Agent

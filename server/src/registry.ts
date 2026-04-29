@@ -7,7 +7,7 @@ export type ContentKind = "agents" | "skills" | "templates";
 export interface ContentEntry {
   name: string;
   kind: ContentKind;
-  /** Paths in merge order: generic, platform, project. Only existing files. */
+  /** Paths in merge order: generic, project. Only existing files. */
   layers: string[];
 }
 
@@ -19,7 +19,7 @@ export interface ContentIndex {
 
 /**
  * Scan the content root and build an index of all available content.
- * For each item, records which layer files exist (generic, platform, project).
+ * For each item, records which layer files exist (generic, project).
  */
 export function buildIndex(config: ServerConfig): ContentIndex {
   const index: ContentIndex = {
@@ -101,7 +101,7 @@ function scanSkillDirs(
 
 /**
  * Return the ordered list of layer directories for a given content kind.
- * Order: generic (root) -> platform -> project
+ * Order: generic (root) -> project (optional)
  */
 function getLayerDirs(config: ServerConfig, kind: ContentKind): string[] {
   const dirs: string[] = [];
@@ -109,12 +109,7 @@ function getLayerDirs(config: ServerConfig, kind: ContentKind): string[] {
   // Layer 1: generic (flat at content root)
   dirs.push(join(config.contentRoot, kind));
 
-  // Layer 2: platform
-  if (config.platform) {
-    dirs.push(join(config.contentRoot, "platforms", config.platform, kind));
-  }
-
-  // Layer 3: project
+  // Layer 2: project (optional)
   if (config.project) {
     dirs.push(join(config.contentRoot, "projects", config.project, kind));
   }

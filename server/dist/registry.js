@@ -3,7 +3,7 @@ import { join, basename } from "path";
 import { log } from "./config.js";
 /**
  * Scan the content root and build an index of all available content.
- * For each item, records which layer files exist (generic, platform, project).
+ * For each item, records which layer files exist (generic, project).
  */
 export function buildIndex(config) {
     const index = {
@@ -65,17 +65,13 @@ function scanSkillDirs(config, map) {
 }
 /**
  * Return the ordered list of layer directories for a given content kind.
- * Order: generic (root) -> platform -> project
+ * Order: generic (root) -> project (optional)
  */
 function getLayerDirs(config, kind) {
     const dirs = [];
     // Layer 1: generic (flat at content root)
     dirs.push(join(config.contentRoot, kind));
-    // Layer 2: platform
-    if (config.platform) {
-        dirs.push(join(config.contentRoot, "platforms", config.platform, kind));
-    }
-    // Layer 3: project
+    // Layer 2: project (optional)
     if (config.project) {
         dirs.push(join(config.contentRoot, "projects", config.project, kind));
     }

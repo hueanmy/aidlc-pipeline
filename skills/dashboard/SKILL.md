@@ -36,7 +36,7 @@ For each epic folder, check which artifacts exist and have **real content** (not
 | `test-plan` | Test plan has real content | `TEST-PLAN.md` |
 | `implement` | Feature branch exists | `git branch --all --list "*{{EPIC_PREFIX}}-XXXX*"` |
 | `review` | Approval doc marked approved | `APPROVAL.md` contains `[x]` |
-| `uat` | UAT script has real content | `UAT-SCRIPT.md` |
+| `execute-test` | Test script has real content | `TEST-SCRIPT.md` |
 | `release` | Git tag exists for commits | `git log --grep="{{EPIC_PREFIX}}-XXXX" --format="%D"` |
 | `monitor` | Health report generated / postmortem filed | `HEALTH.md` or `docs/sdlc/incidents/` |
 | `doc-sync` | Reverse sync completed | `DOC-REVERSE-SYNC.md` has real content |
@@ -81,7 +81,7 @@ Show only enabled phases, numbered sequentially:
 | 4 | Release | RM | Pending | /release + /deploy prod | — |
 | 5 | Doc Sync | Archivist | Pending | /doc-sync | — |
 
-**Skipped**: Design, Test Plan, UAT, Monitor
+**Skipped**: Design, Test Plan, Execute-Test, Monitor
 **Current phase**: 3. Review — Tech Lead
 **Next action**: `/review`
 ```

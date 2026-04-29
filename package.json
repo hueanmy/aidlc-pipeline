@@ -11,7 +11,8 @@
     "skills/",
     "agents/",
     "templates/",
-    "platforms/"
+    "config/",
+    "schemas/"
   ],
   "scripts": {
     "build": "cd server && npm run build",

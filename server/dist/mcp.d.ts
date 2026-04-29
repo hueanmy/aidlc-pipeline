@@ -5,7 +5,6 @@ export interface McpInstance {
     config: ServerConfig;
 }
 export declare function createMcpServer(overrides?: {
-    platform?: string;
     project?: string;
 }): McpInstance;
 //# sourceMappingURL=mcp.d.ts.map

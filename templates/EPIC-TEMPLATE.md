@@ -114,8 +114,8 @@ _Who benefits and how? Include metrics if possible (e.g., "reduce failure rate f
 | End-to-End Tests | Passing | ⬜ | (CI link / manual report) |
 | **Delivery** | | | |
 | CI/CD Build | Release build | ⬜ | (build link) |
-| UAT Script | UAT test script | ⬜ | `epics/[EPIC-KEY]/UAT-SCRIPT.md` |
-| UAT | UAT sign-off | ⬜ | |
+| Test Script | Executable test scenarios for human testers | ⬜ | `epics/[EPIC-KEY]/TEST-SCRIPT.md` |
+| Execute-Test | Test run + sign-off | ⬜ | |
 | Release | Included in version | ⬜ | vX.Y.Z |
 | **Closure** | | | |
 | Doc Reverse-Sync | Docs updated | ⬜ | `epics/[EPIC-KEY]/DOC-REVERSE-SYNC.md` |

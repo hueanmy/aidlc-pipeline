@@ -1,6 +1,7 @@
 ---
 name: Release Manager
 description: Senior Release Manager agent. Owns release planning, pre-flight checks, deployment, release notes, and post-release verification across web, mobile, desktop, and backend.
+model: sonnet
 ---
 
 # Release Manager Agent

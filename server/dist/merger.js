@@ -16,12 +16,20 @@ export function mergeContent(layerPaths, projectConfig) {
     if (layerPaths.length === 0) {
         return "";
     }
+    // Frontmatter from the base (first) layer is preserved verbatim — fields
+    // like `name`, `description`, and `model` are agent-level config and must
+    // survive the merge. Later layers may override section bodies but cannot
+    // change frontmatter.
+    let baseFrontmatter = {};
     // Parse all layers into section maps
-    const layerSections = layerPaths.map((path) => {
+    const layerSections = layerPaths.map((path, idx) => {
         try {
             const raw = readFileSync(path, "utf-8");
-            const { content } = matter(raw);
-            return parseSections(content);
+            const parsed = matter(raw);
+            if (idx === 0) {
+                baseFrontmatter = parsed.data;
+            }
+            return parseSections(parsed.content);
         }
         catch (err) {
             log(`Failed to read layer file ${path}: ${err}`);
@@ -35,12 +43,18 @@ export function mergeContent(layerPaths, projectConfig) {
         merged = applySectionOverlay(merged, layerSections[i]);
     }
     // Reassemble into markdown
-    let result = assembleSections(merged);
+    let body = assembleSections(merged);
     // Substitute placeholders
     if (projectConfig?.placeholders) {
-        result = substitutePlaceholders(result, projectConfig.placeholders);
+        body = substitutePlaceholders(body, projectConfig.placeholders);
     }
-    return result.trim();
+    body = body.trim();
+    // Re-emit frontmatter (if the base layer had any) on top of the body.
+    // Use gray-matter's stringify to keep formatting consistent.
+    if (Object.keys(baseFrontmatter).length === 0) {
+        return body;
+    }
+    return matter.stringify(body + "\n", baseFrontmatter).trim();
 }
 /**
  * Parse markdown into sections. Each section starts at a `## ` heading

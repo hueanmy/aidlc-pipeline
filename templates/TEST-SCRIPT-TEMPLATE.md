@@ -1,9 +1,9 @@
-# UAT Test Script: [Feature Title]
+# Test Script: [Feature Title]
 
 > **Epic**: [[EPIC-KEY] — Epic Title](../epics/[EPIC-KEY]/[EPIC-KEY].md)
 > **Build**: vX.Y.Z (Build XX)
 > **Environment**: UAT / staging
-> Copy to `docs/sdlc/epics/[EPIC-KEY]/UAT-SCRIPT.md`
+> Copy to `docs/sdlc/epics/[EPIC-KEY]/TEST-SCRIPT.md`
 >
 > This script is for **non-technical testers** (PM, stakeholders). Write steps they can follow in their own environment.
 
@@ -83,7 +83,7 @@
 
 ---
 
-## UAT Verdict
+## Verdict
 
 | Criterion | Status |
 |-----------|--------|

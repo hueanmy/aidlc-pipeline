@@ -6,7 +6,7 @@ EPICS_DIR := docs/sdlc/epics
 ## Epic management
 epic: ## Scaffold a new epic (make epic KEY=XXX-1234)
 	@mkdir -p $(EPICS_DIR)/$(KEY)
-	@for f in EPIC.md PRD.md TECH-DESIGN.md TEST-PLAN.md UAT-SCRIPT.md APPROVAL.md DOC-REVERSE-SYNC.md; do \
+	@for f in EPIC.md PRD.md TECH-DESIGN.md TEST-PLAN.md TEST-SCRIPT.md APPROVAL.md DOC-REVERSE-SYNC.md; do \
 		cp docs/sdlc/templates/$$(echo $$f | sed 's/EPIC.md/EPIC-TEMPLATE.md/;s/DOC-REVERSE-SYNC.md/DOC-REVERSE-SYNC-TEMPLATE.md/') $(EPICS_DIR)/$(KEY)/$$f 2>/dev/null || touch $(EPICS_DIR)/$(KEY)/$$f; \
 	done
 	@mv $(EPICS_DIR)/$(KEY)/EPIC.md $(EPICS_DIR)/$(KEY)/$(KEY).md 2>/dev/null || true

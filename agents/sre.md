@@ -1,6 +1,7 @@
 ---
 name: SRE
 description: Senior SRE / Production Engineer agent. Owns post-release monitoring, incident response, and hotfix coordination across web, mobile, desktop, and backend services.
+model: sonnet
 ---
 
 # SRE Agent

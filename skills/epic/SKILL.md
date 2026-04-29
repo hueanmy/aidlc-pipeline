@@ -21,7 +21,7 @@ Load your full persona from `.claude/agents/po.md` before starting.
    - **User Stories** — ID, story, high-level acceptance criteria (detailed in PRD), priority (MoSCoW)
    - **Affected Areas** — which surfaces / modules / services this epic touches
    - **Dependencies** — APIs, designs, other epics, legal/compliance, vendor readiness
-   - **Epic Phases** — Planning → Implementation → Testing → UAT → Release → Doc-Sync (skip phases your pipeline config disables)
+   - **Epic Phases** — Planning → Implementation → Testing → Execute-Test → Release → Doc-Sync (skip phases your pipeline config disables)
    - **Risks & Mitigations** — known unknowns and how you'll handle them
 4. If a title is provided as the second argument, use it as the epic title
 

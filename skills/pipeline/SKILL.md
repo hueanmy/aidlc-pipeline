@@ -1,7 +1,7 @@
 ---
 name: pipeline
 description: Run the full SDLC pipeline for an epic. Orchestrates all team agents (PO, Tech Lead, QA, Dev, RM, SRE, Archivist) through each phase. Use to kick off or resume an epic's lifecycle.
-argument-hint: "<{{EPIC_PREFIX}}-XXXX> [phase] (phases: plan, design, test-plan, implement, review, uat, release, monitor, doc-sync, or \"full\" for all)"
+argument-hint: "<{{EPIC_PREFIX}}-XXXX> [phase] (phases: plan, design, test-plan, implement, review, execute-test, release, monitor, doc-sync, or \"full\" for all)"
 ---
 
 # SDLC Pipeline Orchestrator
@@ -26,7 +26,7 @@ Every phase must run in a separate chat session.
 | **PO** | Product Owner | `/epic`, `/prd` | `.claude/agents/po.md` |
 | **TL** | Tech Lead | `/tech-design`, `/review`, `/coding-rules` | `.claude/agents/tech-lead.md` |
 | **Dev** | Developer | implementation, `/simplify` | `.claude/agents/developer.md` |
-| **QA** | QA Engineer | `/test-plan`, `/coverage`, `/uat` | `.claude/agents/qa.md` |
+| **QA** | QA Engineer | `/test-plan`, `/coverage`, `/execute-test` | `.claude/agents/qa.md` |
 | **RM** | Release Manager | `/deploy`, `/release`, `/release-notes` | `.claude/agents/release-manager.md` |
 | **SRE** | SRE / Healer | `/monitor`, `/hotfix` | `.claude/agents/sre.md` |
 | **Archivist** | Doc Guardian | `/doc-sync` | `.claude/agents/archivist.md` |
@@ -39,7 +39,7 @@ Phase 2: DESIGN      → TL agent     → /tech-design
 Phase 3: TEST-PLAN   → QA agent     → /test-plan
 Phase 4: IMPLEMENT   → Dev agent    → coding (manual — provide guidance)
 Phase 5: REVIEW      → TL agent     → /review
-Phase 6: UAT         → QA agent     → /uat + testing
+Phase 6: EXECUTE-TEST → QA agent    → /execute-test + testing
 Phase 7: RELEASE     → RM agent     → /release + /release-notes + /deploy
 Phase 8: MONITOR     → SRE agent    → /monitor
 Phase 9: DOC-SYNC    → Archivist    → /doc-sync
@@ -75,7 +75,7 @@ Expected format:
 - If `pipeline.json` does not exist → all 9 phases are enabled (default behavior)
 - If `pipeline.json` exists → ONLY run/show phases listed in `enabledPhases`
 - Disabled phases are **completely skipped** — they don't appear in the dashboard, don't block dependencies, and are not suggested as next steps
-- Phase IDs: `plan`, `design`, `test-plan`, `implement`, `review`, `uat`, `release`, `monitor`, `doc-sync`
+- Phase IDs: `plan`, `design`, `test-plan`, `implement`, `review`, `execute-test`, `release`, `monitor`, `doc-sync`
 
 Store the enabled phases list — all subsequent steps use it as a filter.
 
@@ -96,7 +96,7 @@ ls docs/sdlc/epics/$0/ 2>/dev/null
 | `test-plan` | `TEST-PLAN.md` with content | Test Plan |
 | `implement` | Code changes on feature branch | Implement |
 | `review` | PR merged or review complete | Review |
-| `uat` | `UAT-SCRIPT.md` with content | UAT prep |
+| `execute-test` | `TEST-SCRIPT.md` with content | Test execution prep |
 | `release` | Deployed to {{DEPLOY_TARGET}} | Release |
 | `monitor` | Health report generated | Monitor |
 | `doc-sync` | `DOC-REVERSE-SYNC.md` with content | Doc Sync |
@@ -124,7 +124,7 @@ Calculate progress as: `completed enabled phases / total enabled phases`.
 
 **Current phase**: [Phase N] — [Agent Name]
 **Next action**: [What the user should do or what agent to run]
-**Skipped phases**: design, test-plan, uat, monitor (disabled in pipeline.json)
+**Skipped phases**: design, test-plan, execute-test, monitor (disabled in pipeline.json)
 ```
 
 The example above shows a pipeline with only 5 of 9 phases enabled. Adapt the table to whatever the epic's `pipeline.json` specifies. If all 9 are enabled (or no `pipeline.json` exists), show the full table as before.
@@ -144,7 +144,7 @@ Run only one phase per chat session.
 After completing any phase, determine the **next enabled phase** by looking up `enabledPhases` from `pipeline.json`:
 
 ```
-Phase order: plan → design → test-plan → implement → review → uat → release → monitor → doc-sync
+Phase order: plan → design → test-plan → implement → review → execute-test → release → monitor → doc-sync
 ```
 
 1. Find the current phase in the ordered list
@@ -218,23 +218,23 @@ Done when: Review verdict is "Approve" or "Approve with comments"
 Handoff to: next enabled phase after "review"
 ```
 
-### Phase: UAT (QA Agent) — id: `uat`
+### Phase: EXECUTE-TEST (QA Agent) — id: `execute-test`
 ```
 Prerequisites (only enforce for enabled phases):
   - "review" enabled → Code must be reviewed
-Run: /uat $0           — QA generates UAT script for testers
+Run: /execute-test $0   — QA generates test script for testers
 
-Then: Deploy to UAT (/deploy uat) and execute UAT script
+Then: Deploy to UAT environment (/deploy uat) and execute the test script
 
-Done when: UAT script written, deployed to UAT, testers sign off
-Handoff to: next enabled phase after "uat"
+Done when: Test script written, deployed to UAT environment, testers sign off
+Handoff to: next enabled phase after "execute-test"
 ```
 
 ### Phase: RELEASE (Release Manager Agent) — id: `release`
 ```
 Prerequisites (only enforce for enabled phases):
-  - "uat" enabled → UAT must have passed
-  - "review" enabled (and "uat" disabled) → Review must have passed
+  - "execute-test" enabled → Test execution must have passed
+  - "review" enabled (and "execute-test" disabled) → Review must have passed
 Run in order:
 1. /release X.Y.Z          — RM creates release checklist
 2. /release-notes X.Y.Z    — RM generates all release notes
@@ -273,7 +273,7 @@ If no more enabled phases → Pipeline complete!
 ```
 plan → (skip design, skip test-plan) → implement
 implement → (skip nothing) → review
-review → (skip uat) → release
+review → (skip execute-test) → release
 release → (skip monitor) → doc-sync
 doc-sync → Pipeline complete!
 ```
@@ -282,7 +282,7 @@ doc-sync → Pipeline complete!
 ```
 plan → design
 design → (skip test-plan) → implement
-implement → (skip review, skip uat) → release
+implement → (skip review, skip execute-test) → release
 release → Pipeline complete!
 ```
 
@@ -293,7 +293,7 @@ The full dependency chain when all phases are enabled:
 PLAN ─────→ DESIGN ───→ TEST-PLAN ───→ IMPLEMENT
                                             │
                                             ▼
-              DOC-SYNC ←── MONITOR ←── RELEASE ←── UAT ←── REVIEW
+              DOC-SYNC ←── MONITOR ←── RELEASE ←── EXECUTE-TEST ←── REVIEW
 ```
 
 **Hard gates** (cannot proceed without):
@@ -301,8 +301,8 @@ PLAN ─────→ DESIGN ───→ TEST-PLAN ───→ IMPLEMENT
 - TEST-PLAN requires: PRD + Tech Design
 - IMPLEMENT requires: Tech Design + Test Plan
 - REVIEW requires: Code committed
-- UAT requires: Code reviewed
-- RELEASE (prod) requires: UAT passed
+- EXECUTE-TEST requires: Code reviewed
+- RELEASE (prod) requires: EXECUTE-TEST passed
 - DOC-SYNC requires: Code merged
 
 ### When phases are disabled — dependency resolution:
@@ -312,8 +312,8 @@ PLAN ─────→ DESIGN ───→ TEST-PLAN ───→ IMPLEMENT
 Examples:
 - `design` disabled → `test-plan` no longer requires Tech Design, only PRD
 - `design` + `test-plan` disabled → `implement` has no doc prerequisites (just needs Plan/PRD done)
-- `uat` disabled → `release` no longer requires UAT passed, only Review passed
-- `review` + `uat` disabled → `release` only requires code committed (Implement done)
+- `execute-test` disabled → `release` no longer requires test execution passed, only Review passed
+- `review` + `execute-test` disabled → `release` only requires code committed (Implement done)
 - `monitor` disabled → `doc-sync` only requires code merged
 
 **Rule**: For each enabled phase, check its hard gates. If a gate references a disabled phase, skip that gate. Only enforce gates for phases that are in `enabledPhases`.

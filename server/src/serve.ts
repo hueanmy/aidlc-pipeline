@@ -11,13 +11,11 @@ const sessions = new Map<string, SSEServerTransport>();
 
 // SSE endpoint — client connects here to establish the stream
 app.get("/sse", (req, res) => {
-  // Read platform/project from query params or env
-  const platform = (req.query.platform as string) || process.env.SDLC_PLATFORM;
   const project = (req.query.project as string) || process.env.SDLC_PROJECT;
 
-  log(`SSE connection: platform=${platform ?? "none"}, project=${project ?? "none"}`);
+  log(`SSE connection: project=${project ?? "none"}`);
 
-  const { server } = createMcpServer({ platform, project });
+  const { server } = createMcpServer({ project });
   const transport = new SSEServerTransport("/messages", res);
 
   sessions.set(transport.sessionId, transport);
@@ -55,7 +53,6 @@ app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
     sessions: sessions.size,
-    platform: process.env.SDLC_PLATFORM ?? null,
     project: process.env.SDLC_PROJECT ?? null,
   });
 });
@@ -64,5 +61,4 @@ app.listen(PORT, () => {
   log(`Remote MCP server listening on http://localhost:${PORT}`);
   log(`SSE endpoint: http://localhost:${PORT}/sse`);
   log(`Health check: http://localhost:${PORT}/health`);
-  log(`Connect with: http://localhost:${PORT}/sse?platform=mobile&project=sample-project`);
 });

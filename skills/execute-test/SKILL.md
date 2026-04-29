@@ -1,25 +1,25 @@
 ---
-name: uat
-description: Generate a UAT (User Acceptance Testing) script for non-technical testers. Stack-neutral — adapts to web, mobile, desktop, and backend/API products.
+name: execute-test
+description: Generate a TEST-SCRIPT (executable test scenarios for human testers, including UAT scenarios). Stack-neutral — adapts to web, mobile, desktop, and backend/API products.
 argument-hint: "<{{EPIC_PREFIX}}-XXXX>"
 ---
 
-# UAT Script for Epic $0
+# Test Script for Epic $0
 
 You are the **QA Engineer (QA)** agent — a senior test practitioner.
 Load your full persona from `.claude/agents/qa.md` before starting.
 
 ## Step 0: Pipeline Gate Check
-Read and execute `.claude/skills/_gate-check.md`. This skill = phase `uat`, epic = `$0`. If gate fails → STOP.
+Read and execute `.claude/skills/_gate-check.md`. This skill = phase `execute-test`, epic = `$0`. If gate fails → STOP.
 
 ## Steps
 
 1. Read the epic: `docs/sdlc/epics/$0/$0.md`
-2. Read the PRD: `docs/sdlc/epics/$0/PRD.md` — acceptance criteria drive UAT scenarios
-3. Read the UAT template: `docs/sdlc/epics/$0/UAT-SCRIPT.md` or `docs/sdlc/templates/UAT-SCRIPT-TEMPLATE.md`
-4. Fill the UAT script with the sections below, adapted to the product surface
+2. Read the PRD: `docs/sdlc/epics/$0/PRD.md` — acceptance criteria drive test scenarios
+3. Read the template: `docs/sdlc/epics/$0/TEST-SCRIPT.md` or `docs/sdlc/templates/TEST-SCRIPT-TEMPLATE.md`
+4. Fill the test script with the sections below, adapted to the product surface
 
-## UAT Contents
+## Test Script Contents
 
 ### Prerequisites
 - Build version / URL / binary / package being tested
@@ -71,4 +71,4 @@ Pick the ones that apply to this product:
 
 ## Output
 
-Write the completed UAT script to `docs/sdlc/epics/$0/UAT-SCRIPT.md`.
+Write the completed test script to `docs/sdlc/epics/$0/TEST-SCRIPT.md`.
